@@ -1,0 +1,61 @@
+import dynamic from "next/dynamic";
+import { FaRegUser, FaRegListAlt, FaEye, FaRegNewspaper } from "react-icons/fa";
+import { FiSend } from "react-icons/fi";
+import { MdComputer, MdDashboard } from "react-icons/md";
+import { MenuData } from "./types";
+import { quoteData } from "./data/profile";
+
+export { quoteData };
+
+const About = dynamic(() => import("@/components/aboutPage/About"));
+const Resume = dynamic(() => import("@/components/resumePage/Resume"));
+const Works = dynamic(() => import("@/components/worksPage/Works"));
+const DevBlogs = dynamic(() => import("@/components/blogsPage/DevBlogs"));
+const Contact = dynamic(() => import("@/components/contactPage/Contact"));
+const GuestBook = dynamic(() => import("@/components/guestbookPage/GuestBook"));
+const Stats = dynamic(() => import("@/components/statisticsPage/Stats"));
+
+export const menus: MenuData[] = [
+  {
+    id: 1,
+    label: "about",
+    Icon: FaRegUser,
+    Component: About,
+  },
+  {
+    id: 2,
+    label: "resume",
+    Icon: FaRegListAlt,
+    Component: Resume,
+  },
+  {
+    id: 3,
+    label: "works",
+    Icon: FaEye,
+    Component: Works,
+  },
+  {
+    id: 4,
+    label: "blog",
+    Icon: FaRegNewspaper,
+    Component: DevBlogs,
+  },
+  {
+    id: 5,
+    label: "stats",
+    Icon: MdDashboard,
+    Component: Stats,
+  },
+  {
+    id: 6,
+    label: "contact",
+    Icon: FiSend,
+    Component: Contact,
+  },
+  {
+    id: 7,
+    label: "guest book",
+    Icon: MdComputer,
+    Component: GuestBook,
+  },
+];
