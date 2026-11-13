@@ -1,53 +1,63 @@
+"use client";
+
 import { BsFillCloudArrowDownFill } from "react-icons/bs";
-import { SiUpwork } from "react-icons/si";
-import { ProfileData } from "@/types";
-import { upworkProfileUrl } from "@/data/profile";
+import Image from "next/image";
+import { useSite } from "./SiteProvider";
+import { iconRegistry } from "./icons";
 import MediaIcons from "./MediaIcons";
 import MyLink from "./MyLink";
 import Slide from "./Slide";
 import Typing from "./Typing";
-import Image from "next/image";
 
-interface Props {
-  profileData: ProfileData;
-}
+export default function ProfileCard() {
+  const { profile, socialLinks } = useSite();
+  const HireIcon = profile.hireLink
+    ? iconRegistry[profile.hireLink.icon as keyof typeof iconRegistry]
+    : undefined;
 
-export default function ProfileCard({ profileData }: Props) {
   return (
     <div className="profile h-full lg:w-[42rem] xl:w-[48rem] bg-gray-900 rounded-lg relative lg:block hidden">
       <div className="relative z-40 w-full h-full myShadow">
-        <Slide images={profileData.bgImages} />
+        <Slide images={profile.backgroundImages} />
 
         <div className="relative z-20 w-56 h-56 mx-auto -mt-36 rounded-full profilePic">
-          <Image
-            src={profileData.ownersPhoto.url}
-            alt="userPic"
-            fill
-            sizes="112px"
-            style={{ objectFit: "cover" }}
-            className="w-full h-full block p-0 z-20 relative object-cover rounded-full border-4 border-[#1c1b1b] border-solid"
-          />
+          {profile.avatar && (
+            <Image
+              src={profile.avatar.url}
+              alt={profile.avatar.alt || profile.name}
+              fill
+              sizes="112px"
+              style={{ objectFit: "cover" }}
+              className="w-full h-full block p-0 z-20 relative object-cover rounded-full border-4 border-[#1c1b1b] border-solid"
+            />
+          )}
         </div>
 
         <h1 className="text-center text-gray-300 text-[3.4rem] font-medium mt-4 mb-0.5">
-          {profileData.name}
+          {profile.name}
         </h1>
 
-        <Typing />
-        <MediaIcons socialMedia={profileData.socialMedia} />
+        <Typing titles={profile.typingTitles} />
+        <MediaIcons socialLinks={socialLinks} />
 
         <div className="flex absolute bottom-0 left-0 w-full h-28 borderLeft customLine">
-          <MyLink
-            name="download cv"
-            Icon={BsFillCloudArrowDownFill}
-            url={profileData.cv}
-            border
-          />
-          <MyLink
-            name="my upwork"
-            Icon={SiUpwork}
-            url={upworkProfileUrl}
-          />
+          {profile.cvUrl && (
+            <MyLink
+              name="download cv"
+              Icon={BsFillCloudArrowDownFill}
+              url={profile.cvUrl}
+              border={Boolean(profile.hireLink)}
+              full={!profile.hireLink}
+            />
+          )}
+          {profile.hireLink && HireIcon && (
+            <MyLink
+              name={profile.hireLink.label}
+              Icon={HireIcon}
+              url={profile.hireLink.url}
+              full={!profile.cvUrl}
+            />
+          )}
         </div>
       </div>
     </div>

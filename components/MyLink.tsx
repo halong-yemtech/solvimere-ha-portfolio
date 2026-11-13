@@ -4,17 +4,19 @@ import Link from "next/link";
 interface Props {
   name: string;
   border?: boolean;
+  /** Take the whole row (when it is the only link). */
+  full?: boolean;
   Icon: IconType;
   url: string;
 }
 
-export default function MyLink({ name, Icon, border, url }: Props) {
+export default function MyLink({ name, Icon, border, full, url }: Props) {
   return (
     <Link
       rel="noreferrer"
       target="_blank"
       href={url}
-      className={`w-1/2 ${
+      className={`${full ? "w-full" : "w-1/2"} ${
         border ? "vCustomLine relative before:right-0" : ""
       } h-full flex justify-center items-center gap-4 text-xl text-gray-300 font-semibold uppercase cursor-pointer group`}
     >

@@ -1,20 +1,21 @@
 "use client";
 
 import { useMemo } from "react";
-import { useReactiveVar } from "@apollo/client/react";
+import { useReactiveVar } from "@/lib/state";
 import Title from "../Title";
 import Work from "./Work";
-import { currentWorkTab } from "@/lib/apollo/apolloClient";
+import { currentWorkTab } from "@/lib/state";
 import { motion, AnimatePresence } from "framer-motion";
-import { works } from "@/data/works";
+import { useSite } from "../SiteProvider";
 
 export default function Works() {
   const currentTab = useReactiveVar(currentWorkTab);
+  const { works } = useSite();
 
   const filteredWorks = useMemo(() => {
     if (currentTab === "All") return works;
-    return works.filter((w) => w.workTabs.some((t) => t.tab === currentTab));
-  }, [currentTab]);
+    return works.filter((w) => w.categories.includes(currentTab));
+  }, [currentTab, works]);
 
   return (
     <div
@@ -29,7 +30,7 @@ export default function Works() {
             <Work
               key={w.id}
               title={w.title}
-              imageUrl={w.images[0].url}
+              image={w.images[0]}
               projectId={w.id}
               priority={idx === 0}
             />

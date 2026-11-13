@@ -1,16 +1,17 @@
 import Image from "next/image";
 import { FaPlus } from "react-icons/fa";
 import { motion } from "framer-motion";
-import { currentWork } from "@/lib/apollo/apolloClient";
+import { currentWork } from "@/lib/state";
+import type { SiteImage } from "@/lib/siteTypes";
 
 interface Props {
   title: string;
-  imageUrl: string;
-  projectId: string;
+  image: SiteImage | undefined;
+  projectId: number;
   priority?: boolean;
 }
 
-export default function Work({ title, imageUrl, projectId, priority }: Props) {
+export default function Work({ title, image, projectId, priority }: Props) {
   return (
     <motion.li
       initial={{ opacity: 0 }}
@@ -22,15 +23,17 @@ export default function Work({ title, imageUrl, projectId, priority }: Props) {
       <div className="group work-wrapper cursor-pointer">
         <div className={`relative w-full h-[35rem] lg:h-72 work`}>
           <FaPlus className="text-main-orange text-5xl z-10 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 transition-all duration-300 group-hover:opacity-100" />
+          {image && (
           <Image
-            src={imageUrl}
-            alt="project"
+            src={image.url}
+            alt={image.alt || title}
             style={{ objectFit: "cover" }}
             fill
             priority={priority}
             sizes="(min-width: 640px) 50vw, 100vw"
             className="group-hover:scale-105 transition-all duration-500"
           />
+          )}
         </div>
         <p className="capitalize text-gray-300 text-2xl text-center mt-6 mb-4 tracking-wide group-hover:text-main-orange transition-all duration-150">
           {title}

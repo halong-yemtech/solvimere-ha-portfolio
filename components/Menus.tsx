@@ -3,9 +3,9 @@
 import MenuBtn from "./MenuBtn";
 import { BsBookHalf } from "react-icons/bs";
 import { menus } from "../data";
-import { useReactiveVar } from "@apollo/client/react";
-import { ReactiveVar } from "@apollo/client";
-import { currentMenu } from "@/lib/apollo/apolloClient";
+import { useReactiveVar } from "@/lib/state";
+import type { ReactiveVar } from "@/lib/state";
+import { currentMenu } from "@/lib/state";
 
 interface Props {
   showSideMenu: ReactiveVar<boolean>;

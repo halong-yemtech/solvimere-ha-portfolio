@@ -7,20 +7,21 @@ import { AiFillCloseCircle } from "react-icons/ai";
 import { HiOutlineViewGridAdd } from "react-icons/hi";
 import MyInfo from "../MyInfo";
 import { motion } from "framer-motion";
-import { SingleWorkData } from "@/types";
-import { ReactiveVar } from "@apollo/client";
+import type { ReactiveVar } from "@/lib/state";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { BsGithub } from "react-icons/bs";
-import { getWorkById } from "@/data/works";
+import { useSite } from "../SiteProvider";
 
 interface Props {
-  workId: string;
-  reactiveVar: ReactiveVar<string | null>;
+  workId: number;
+  reactiveVar: ReactiveVar<number | null>;
 }
 
 export default function WorkLb({ workId, reactiveVar }: Props) {
-  const workData = getWorkById(workId);
+  const { works } = useSite();
+  const workData = works.find((w) => w.id === workId);
+  const cover = workData?.images[0];
 
   function closeLb(e: MouseEvent): void {
     if ((e.target as Element).classList.contains("lb")) {
@@ -47,10 +48,11 @@ export default function WorkLb({ workId, reactiveVar }: Props) {
           <AiFillCloseCircle />
         </button>
 
+        {cover && (
         <div className="relative w-full h-[30rem]">
           <Image
-            src={workData.images[0].url}
-            alt="project description"
+            src={cover.url}
+            alt={cover.alt || workData.title}
             fill
             sizes="(min-width: 840px) 800px, 95vw"
             priority
@@ -58,14 +60,15 @@ export default function WorkLb({ workId, reactiveVar }: Props) {
             className="rounded-t-lg"
           />
         </div>
+        )}
 
         <div className="p-12">
           <div className="flex flex-wrap items-center justify-between gap-6 mb-4 text-4xl font-semibold tracking-wide text-gray-300 capitalize">
             <h1>{workData.title}</h1>
             <div className="flex flex-wrap gap-4">
-              {workData.workUrl && (
+              {workData.projectUrl && (
                 <Link
-                  href={workData.workUrl}
+                  href={workData.projectUrl}
                   rel="noreferrer"
                   target="_blank"
                   className="text-[1.4rem] flex items-center gap-2 rounded-full py-1.5 px-6 tracking-wide font-semibold capitalize hover:bg-sky-600 transition-all duration-300 text-white bg-sky-500"
@@ -89,20 +92,27 @@ export default function WorkLb({ workId, reactiveVar }: Props) {
           </div>
 
           <ul className="location grid grid-cols-1 sm:grid-cols-2 mt-6 gap-y-2 mb-8">
-            <MyInfo field="client" value={workData.clientName} />
-            <MyInfo field="owner" value={workData.ownerName} />
-            <MyInfo field="categories" value="Project" />
+            {workData.client && <MyInfo field="client" value={workData.client} />}
+            {workData.owner && <MyInfo field="owner" value={workData.owner} />}
             <MyInfo
-              field="date"
-              value={new Date(workData.date).toLocaleDateString()}
+              field="categories"
+              value={workData.categories.join(", ") || "Project"}
             />
+            {workData.date && (
+              <MyInfo
+                field="date"
+                value={new Date(workData.date).toLocaleDateString("en-US", {
+                  month: "short",
+                  year: "numeric",
+                })}
+              />
+            )}
           </ul>
 
           <article className="my-10 prose max-w-none prose-strong:text-main-orange">
-            <ReactMarkdown
-              children={workData.description}
-              remarkPlugins={[remarkGfm]}
-            />
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {workData.description}
+            </ReactMarkdown>
           </article>
 
           <div className="flex flex-wrap gap-3 mb-8">
@@ -117,7 +127,7 @@ export default function WorkLb({ workId, reactiveVar }: Props) {
           </div>
 
           <ul className="space-y-3">
-            {workData.userActions.map((action) => (
+            {workData.highlights.map((action) => (
               <li
                 key={action}
                 className="text-2xl text-gray-400 capitalize flex items-center gap-3"

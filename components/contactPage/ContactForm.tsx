@@ -1,23 +1,15 @@
 "use client";
 
-import { useMutation } from "@apollo/client/react";
+import { useTransition } from "react";
 import { useForm, SubmitHandler, FieldErrors } from "react-hook-form";
 import { AiOutlineSwapRight } from "react-icons/ai";
-import contactOperations from "@/lib/graphql/contact";
 import toast from "react-hot-toast";
-import { isHygraphConfigured } from "@/lib/config";
-import { profile } from "@/data/profile";
+import { sendContactMessage } from "@/app/(frontend)/actions";
 
 interface Inputs {
   fullName: string;
   email: string;
   message: string;
-}
-
-interface ContactMutation {
-  createContact: {
-    fullName: string;
-  };
 }
 
 const isValidEmail = (email: string) =>
@@ -27,29 +19,18 @@ const isValidEmail = (email: string) =>
 
 export default function ContactForm() {
   const { register, handleSubmit, reset } = useForm<Inputs>();
-  const [sendMessage, { loading }] = useMutation<ContactMutation, Inputs>(
-    contactOperations.Mutation.sendMessage,
-    {
-      onCompleted({ createContact }) {
-        toast.success(`Thanks for contacting me ${createContact.fullName}`, {
-          duration: 5000,
-        });
-        reset({ fullName: "", email: "", message: "" });
-      },
-      onError() {
-        toast.error("Server error. Try again later");
-      },
-    }
-  );
+  const [loading, startTransition] = useTransition();
 
-  const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    if (!isHygraphConfigured) {
-      toast.error(`The form is unavailable right now. Please email ${profile.email}.`, {
-        duration: 6000,
-      });
-      return;
-    }
-    sendMessage({ variables: data });
+  const onSubmit: SubmitHandler<Inputs> = (data) => {
+    startTransition(async () => {
+      const res = await sendContactMessage(data);
+      if (!res.ok) {
+        toast.error(res.error);
+        return;
+      }
+      toast.success(`Thanks for contacting me ${res.data.fullName}`, { duration: 5000 });
+      reset({ fullName: "", email: "", message: "" });
+    });
   };
 
   // Runs once per submit attempt (not on every keystroke).
@@ -90,6 +71,7 @@ export default function ContactForm() {
       <div className="w-[22rem] h-20 bg-[#0e1422d9] flex justify-center items-center gap-3 text-gray-300 group mt-6 rounded-lg cursor-pointer">
         <button
           type="submit"
+          disabled={loading}
           className={`${
             loading ? "pointer-events-none" : "group-hover:text-main-orange"
           } uppercase text-2xl font-semibold group-hover:mx-2 transition-all duration-300`}

@@ -1,10 +1,14 @@
+"use client";
+
 import Testimonial from "../Testimonial";
 import Title from "../Title";
 import MyResume from "./myResume/MyResume";
 import Skills from "./skills/Skills";
-import { quoteData } from "@/data";
+import { useSite } from "../SiteProvider";
 
 export default function Resume() {
+  const { profile } = useSite();
+
   return (
     <section className="h-full overflow-y-scroll myScroll">
       <Title name="resume" />
@@ -13,8 +17,12 @@ export default function Resume() {
       <Title name="skills" />
       <Skills />
 
-      <Title name="quote" />
-      <Testimonial testimonial={quoteData} />
+      {profile.quote && (
+        <>
+          <Title name="quote" />
+          <Testimonial testimonial={profile.quote} />
+        </>
+      )}
     </section>
   );
 }

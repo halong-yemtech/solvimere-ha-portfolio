@@ -1,13 +1,11 @@
 "use client";
 
-import { useMutation } from "@apollo/client/react";
-import { gql } from "@apollo/client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { AiOutlineSwapRight } from "react-icons/ai";
-import guestBookOperations from "@/lib/graphql/guestBook";
-import { isHygraphConfigured } from "@/lib/config";
+import { createGuestbookComment } from "@/app/(frontend)/actions";
+import type { GuestbookComment } from "@/lib/siteTypes";
 
 const GUEST_NAME_KEY = "portfolio_guestName";
 
@@ -16,18 +14,14 @@ interface Inputs {
   comment: string;
 }
 
-interface CreateComment {
-  createGuestBook: {
-    id: string;
-    name: string;
-    comment: string;
-    createdAt: string;
-  };
+interface Props {
+  onCreated: (comment: GuestbookComment) => void;
 }
 
-export default function GuestForm() {
+export default function GuestForm({ onCreated }: Props) {
   const { register, handleSubmit, reset, setValue } = useForm<Inputs>();
   const [isChecked, setIsChecked] = useState<boolean>(false);
+  const [loading, startTransition] = useTransition();
 
   // localStorage only exists in the browser, so read the saved name after mount.
   useEffect(() => {
@@ -39,58 +33,25 @@ export default function GuestForm() {
     }
   }, [setValue]);
 
-  const [createComment, { loading }] = useMutation<CreateComment, Inputs>(
-    guestBookOperations.Mutations.createComment,
-    {
-      update(cache, { data }) {
-        cache.modify({
-          fields: {
-            guestBooksConnection(oldValue) {
-              const newCommentRef = cache.writeFragment({
-                data: data?.createGuestBook,
-                fragment: gql`
-                  fragment NewGuestBook on GuestBook {
-                    id
-                    name
-                    comment
-                    createdAt
-                  }
-                `,
-              });
-              return {
-                ...oldValue,
-                edges: [{ node: newCommentRef }, ...oldValue.edges],
-              };
-            },
-          },
-        });
-      },
-      onCompleted({ createGuestBook }) {
-        toast.success(`Thanks for your comment`, {
-          duration: 5000,
-        });
-        reset({ comment: "", name: createGuestBook.name });
-        if (isChecked) {
-          try {
-            localStorage.setItem(GUEST_NAME_KEY, createGuestBook.name);
-          } catch {
-            // ignore storage errors
-          }
+  const onSubmit: SubmitHandler<Inputs> = (data) => {
+    startTransition(async () => {
+      const res = await createGuestbookComment(data);
+      if (!res.ok) {
+        toast.error(res.error);
+        return;
+      }
+      onCreated(res.data);
+      toast.success("Thanks for your comment", { duration: 5000 });
+      reset({ comment: "", name: res.data.name });
+      if (isChecked) {
+        try {
+          localStorage.setItem(GUEST_NAME_KEY, res.data.name);
+        } catch {
+          // ignore storage errors
         }
-        setIsChecked(false);
-      },
-      onError() {
-        toast.error("Server error. Try again later");
-      },
-    }
-  );
-
-  const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    if (!isHygraphConfigured) {
-      toast.error("The guest book is not available right now.");
-      return;
-    }
-    createComment({ variables: data });
+      }
+      setIsChecked(false);
+    });
   };
 
   const onInvalid = () => toast.error("Please enter both a comment and your name.");
@@ -98,12 +59,12 @@ export default function GuestForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit, onInvalid)}>
       <textarea
-        {...register("comment", { required: true })}
+        {...register("comment", { required: true, maxLength: 2000 })}
         placeholder="Comment"
         className="h-32 mb-4 formStyle"
       ></textarea>
       <input
-        {...register("name", { required: true })}
+        {...register("name", { required: true, maxLength: 80 })}
         type="text"
         placeholder="Name"
         className="h-20 formStyle"
@@ -123,6 +84,7 @@ export default function GuestForm() {
       <fieldset className="w-[22rem] h-20 bg-[#0e1422d9] flex justify-center items-center gap-3 text-gray-300 group mt-6 rounded-lg cursor-pointer">
         <button
           type="submit"
+          disabled={loading}
           className={`${
             loading ? "pointer-events-none" : "group-hover:text-main-orange"
           } uppercase text-2xl font-semibold group-hover:mx-2 transition-all duration-300`}

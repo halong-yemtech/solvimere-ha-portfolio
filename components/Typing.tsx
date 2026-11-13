@@ -1,27 +1,25 @@
 "use client";
 
 import Typewriter from "typewriter-effect";
-import { profile } from "@/data/profile";
 
-export default function Typing() {
-  const [firstTitle, secondTitle] = profile.typingTitles;
+const span = (text: string) =>
+  `<span style="color: #f59e0b; font-size: 14px; font-weight: 400;">${text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")}</span>`;
+
+export default function Typing({ titles }: { titles: string[] }) {
+  if (titles.length === 0) return <div className="h-8" />;
 
   return (
     <div className="text-center h-8">
       <Typewriter
+        // Restart the animation if the titles change.
+        key={titles.join("|")}
         onInit={(typewriter) => {
-          typewriter
-            .typeString(
-              `<span style="color: #f59e0b; font-size: 14px; font-weight: 400;">${firstTitle}</span>`
-            )
-            .pauseFor(3500)
-            .deleteAll(17)
-            .typeString(
-              `<span style="color: #f59e0b; font-size: 14px; font-weight: 400;">${secondTitle}</span>`
-            )
-            .pauseFor(3500)
-            .deleteAll(17)
-            .start();
+          for (const title of titles) {
+            typewriter.typeString(span(title)).pauseFor(3500).deleteAll(17);
+          }
+          typewriter.start();
         }}
         options={{
           autoStart: true,

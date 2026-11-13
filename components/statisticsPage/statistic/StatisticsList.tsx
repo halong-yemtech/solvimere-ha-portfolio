@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Statistic from "./Statistic";
-import { statistics } from "@/data/profile";
+import { useSite } from "../../SiteProvider";
 
 async function fetchData(url: string) {
   try {
@@ -14,6 +14,7 @@ async function fetchData(url: string) {
 }
 
 export default function StatisticsList() {
+  const { statistics } = useSite();
   const [pageViews, setPageViews] = useState<number | null>(null);
 
   useEffect(() => {
@@ -33,8 +34,8 @@ export default function StatisticsList() {
         <Statistic
           key={s.id}
           title={s.title}
-          info={s.info}
-          externalLink={s.externalLink}
+          info={s.value}
+          externalLink={s.link ?? undefined}
         />
       ))}
     </ul>

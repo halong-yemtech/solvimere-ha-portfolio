@@ -1,11 +1,15 @@
+"use client";
+
 import LinkItem from "./LinkItem";
-import { socialMedia } from "@/data/profile";
+import { useSite } from "../../SiteProvider";
 
 export default function LinksList() {
+  const { socialLinks } = useSite();
+
   return (
     <ul className="px-12 py-8 mb-8 space-y-6">
-      {socialMedia.map((sm) => (
-        <LinkItem key={sm.id} socialMedia={sm} />
+      {socialLinks.map((link) => (
+        <LinkItem key={link.id} link={link} />
       ))}
     </ul>
   );

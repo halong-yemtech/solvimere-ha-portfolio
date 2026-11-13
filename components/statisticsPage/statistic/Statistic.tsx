@@ -1,12 +1,13 @@
 import { BiLinkExternal } from "react-icons/bi";
-import { StatisticsData } from "@/types";
 import Link from "next/link";
 
-export default function Statistic({
-  title,
-  info,
-  externalLink,
-}: StatisticsData) {
+interface Props {
+  title: string;
+  info: string | number;
+  externalLink?: string;
+}
+
+export default function Statistic({ title, info, externalLink }: Props) {
   return (
     <li className="relative px-8 py-4 bg-gray-800 rounded-xl group">
       <h3 className="text-3xl mb-2.5 tracking-wider font-medium capitalize text-white">

@@ -1,16 +1,16 @@
 import Link from "next/link";
-import { SocialMediaData } from "@/types";
+import type { SocialLinkData } from "@/lib/siteTypes";
 import MyIcon from "./MyIcon";
 
 interface Props {
-  socialMedia: SocialMediaData[];
+  socialLinks: SocialLinkData[];
 }
 
-export default function MediaIcons({ socialMedia }: Props) {
+export default function MediaIcons({ socialLinks }: Props) {
   return (
     <div className="flex gap-5 items-center justify-center mt-7">
-      {socialMedia.map(({ id, icon, mediaUrl }) => (
-        <Link rel="noreferrer" href={mediaUrl} target="_blank" key={id}>
+      {socialLinks.map(({ id, icon, label, url }) => (
+        <Link rel="noreferrer" href={url} target="_blank" key={id} aria-label={label}>
           <MyIcon
             Icon={icon}
             wrapperClassName=""

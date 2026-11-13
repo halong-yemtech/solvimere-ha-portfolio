@@ -1,8 +1,7 @@
 "use client";
 
-import { workTabs } from "@/data/works";
-import { currentWorkTab } from "@/lib/apollo/apolloClient";
-import { useEffect } from "react";
+import { currentWorkTab } from "@/lib/state";
+import { useSite } from "./SiteProvider";
 
 interface Props {
   name: string;
@@ -10,12 +9,8 @@ interface Props {
 }
 
 export default function Title({ name, currentMenu }: Props) {
-  useEffect(() => {
-    if (currentMenu === undefined) return;
-    if (!currentWorkTab()) {
-      currentWorkTab(workTabs[0]);
-    }
-  }, [currentMenu]);
+  const { workCategories } = useSite();
+  const workTabs = ["All", ...workCategories];
 
   return (
     <div className="customLine relative before:bottom-0 borderLeft z-20 py-10 flex flex-wrap gap-8 justify-center sm:justify-between items-center">

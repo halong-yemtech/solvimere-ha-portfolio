@@ -6,9 +6,11 @@ import Development from "./Development";
 import IconTitle from "../IconTitle";
 import Knowledge from "./Knowledge";
 import Languages from "./Languages";
-import { skills } from "@/data/profile";
+import { useSite } from "../../SiteProvider";
 
 export default function Skills() {
+  const { skills } = useSite();
+
   return (
     <>
       <ul className="grid grid-cols-1 sm:grid-cols-2">

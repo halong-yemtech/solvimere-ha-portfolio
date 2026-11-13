@@ -1,8 +1,13 @@
+"use client";
+
+import Image from "next/image";
 import Link from "next/link";
 import MyIcon from "../../MyIcon";
-import { clients } from "@/data/profile";
+import { useSite } from "../../SiteProvider";
 
 export default function BrandLogos() {
+  const { clients } = useSite();
+
   return (
     <ul className="logos grid sm:grid-cols-4 grid-cols-2">
       {clients.map((client, idx) => (
@@ -15,17 +20,27 @@ export default function BrandLogos() {
             }`}
           >
             <Link
-              href={client.link}
+              href={client.url}
               rel="noreferrer"
               target="_blank"
-              className="inline-flex w-full h-12 items-center justify-center opacity-50 transition-all duration-300 hover:opacity-100"
+              aria-label={client.name}
+              className="relative inline-flex w-full h-12 items-center justify-center opacity-50 transition-all duration-300 hover:opacity-100"
             >
-              <MyIcon
-                Icon={client.icon}
-                size="w-12 h-12"
-                wrapperClassName=""
-                iconClassName="text-5xl text-gray-300"
-              />
+              {client.logo ? (
+                <Image
+                  src={client.logo.url}
+                  alt={client.logo.alt || client.name}
+                  fill
+                  sizes="160px"
+                  style={{ objectFit: "contain" }}
+                />
+              ) : (
+                <MyIcon
+                  Icon={client.icon ?? "FaLink"}
+                  wrapperClassName=""
+                  iconClassName="text-5xl text-gray-300"
+                />
+              )}
             </Link>
           </div>
         </li>

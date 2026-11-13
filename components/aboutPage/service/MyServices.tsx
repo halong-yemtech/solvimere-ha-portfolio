@@ -1,7 +1,11 @@
+"use client";
+
 import MyService from "./MyService";
-import { services } from "@/data/profile";
+import { useSite } from "../../SiteProvider";
 
 export default function MyServices() {
+  const { services } = useSite();
+
   return (
     <ul className="services grid grid-cols-1 sm:grid-cols-2 relative vCustomLine before:left-1/2 before:hidden sm:before:block before:-translate-x-1/2">
       {services.map((s, idx) => (

@@ -3,9 +3,6 @@ import { FaRegUser, FaRegListAlt, FaEye, FaRegNewspaper } from "react-icons/fa";
 import { FiSend } from "react-icons/fi";
 import { MdComputer, MdDashboard } from "react-icons/md";
 import { MenuData } from "./types";
-import { quoteData } from "./data/profile";
-
-export { quoteData };
 
 const About = dynamic(() => import("@/components/aboutPage/About"));
 const Resume = dynamic(() => import("@/components/resumePage/Resume"));

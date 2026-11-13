@@ -1,26 +1,25 @@
 "use client";
 
-import { useReactiveVar } from "@apollo/client/react";
-import { ReactiveVar } from "@apollo/client";
+import { useReactiveVar } from "@/lib/state";
+import type { ReactiveVar } from "@/lib/state";
 import Image from "next/image";
 import Link from "next/link";
 import { MouseEvent } from "react";
 import { IoMdClose } from "react-icons/io";
 import { menus } from "@/data";
-import { profile as profileConfig } from "@/data/profile";
 import SideMenuBtn from "./SideMenuBtn";
-import { ProfileData } from "@/types";
-import { currentMenu } from "@/lib/apollo/apolloClient";
+import { useSite } from "./SiteProvider";
+import { currentMenu } from "@/lib/state";
 import MyIcon from "./MyIcon";
 
 interface Props {
   sideMenu: boolean;
   showMenu: ReactiveVar<boolean>;
-  profile: ProfileData;
 }
 
-export default function SideMenuLb({ sideMenu, showMenu, profile }: Props) {
+export default function SideMenuLb({ sideMenu, showMenu }: Props) {
   const menuId = useReactiveVar(currentMenu);
+  const { profile, socialLinks } = useSite();
 
   function closeLb(e: MouseEvent): void {
     if ((e.target as Element).classList.contains("lb")) {
@@ -45,25 +44,27 @@ export default function SideMenuLb({ sideMenu, showMenu, profile }: Props) {
 
         <div className="top pb-12 pt-36 flex flex-col items-center">
           <div>
-            <Image
-              src={profile.ownersPhoto.url}
-              alt="userPic"
-              style={{ objectFit: "cover" }}
-              width="125"
-              height="125"
-              className="rounded-full"
-            />
+            {profile.avatar && (
+              <Image
+                src={profile.avatar.url}
+                alt={profile.avatar.alt || profile.name}
+                style={{ objectFit: "cover" }}
+                width="125"
+                height="125"
+                className="rounded-full w-[125px] h-[125px]"
+              />
+            )}
             <h3 className="text-[1.65rem] text-gray-300 tracking-wide font-medium capitalize text-center mt-6 mb-4">
               {profile.name}
             </h3>
           </div>
 
           <div className="flex gap-x-5 items-center justify-center">
-            {profile.socialMedia.map(({ id, icon, label, mediaUrl }) => (
+            {socialLinks.map(({ id, icon, label, url }) => (
               <Link
                 rel="noreferrer"
                 target="_blank"
-                href={mediaUrl}
+                href={url}
                 className="tooltip tooltip-bottom"
                 data-tip={label}
                 key={id}
@@ -92,17 +93,19 @@ export default function SideMenuLb({ sideMenu, showMenu, profile }: Props) {
             ))}
           </div>
 
+          {profile.cvUrl && (
           <Link
             rel="noreferrer"
-            href={profile.cv}
+            href={profile.cvUrl}
             target="_blank"
             className="text-gray-300 uppercase text-xl border-2 border-solid border-gray-300 w-56 h-14 rounded-full font-semibold flex items-center justify-center mx-auto mt-12 hover:text-main-orange hover:border-main-orange transition-all duration-200"
           >
             download cv
           </Link>
+          )}
 
           <p className="text-center text-gray-500 text-xl mt-16 mb-10">
-            {profileConfig.copyright}
+            {profile.copyright}
           </p>
         </div>
       </main>

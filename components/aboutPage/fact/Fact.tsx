@@ -1,5 +1,5 @@
 import MyIcon from "../../MyIcon";
-import { FactData } from "@/types";
+import type { FactData } from "@/lib/siteTypes";
 
 interface Props {
   fact: FactData;

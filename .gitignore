@@ -14,3 +14,8 @@ next-env.d.ts
 # misc
 .DS_Store
 *.log
+
+# Payload CMS local data (recreate with `bun run seed`)
+/media
+/portfolio.db
+/portfolio.db-*

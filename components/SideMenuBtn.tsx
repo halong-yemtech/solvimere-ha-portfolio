@@ -1,4 +1,4 @@
-import { ReactiveVar } from "@apollo/client";
+import type { ReactiveVar } from "@/lib/state";
 import { MenuData } from "../types";
 
 interface Props {

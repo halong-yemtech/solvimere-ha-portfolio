@@ -5,9 +5,10 @@ import { EffectFade, Autoplay } from "swiper/modules";
 import "swiper/css";
 import Image from "next/image";
 import "swiper/css/effect-fade";
+import type { SiteImage } from "@/lib/siteTypes";
 
 interface Props {
-  images: { url: string }[];
+  images: SiteImage[];
 }
 
 export default function Slide({ images }: Props) {
@@ -26,11 +27,11 @@ export default function Slide({ images }: Props) {
             <div className="w-full h-full relative">
               <Image
                 src={img.url}
-                alt="tour"
+                alt={img.alt || "background"}
                 fill
                 sizes="(min-width: 1280px) 480px, 420px"
                 style={{ objectFit: "cover" }}
-                priority
+                priority={idx === 0}
               />
             </div>
           </SwiperSlide>

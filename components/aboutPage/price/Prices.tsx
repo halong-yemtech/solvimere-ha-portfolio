@@ -1,17 +1,25 @@
+"use client";
+
 import Price from "./Price";
-import { prices } from "@/data/profile";
-import { DiCodeigniter } from "react-icons/di";
-import { GiCondorEmblem } from "react-icons/gi";
+import { useSite } from "../../SiteProvider";
 
 export default function Prices() {
+  const { pricingPlans } = useSite();
+
   return (
     <ul className="prices grid sm:grid-cols-2 grid-cols-1">
-      <li className="relative vCustomLine sm:before:block before:hidden before:right-0">
-        <Price Icon={DiCodeigniter} price={prices[0]} />
-      </li>
-      <li>
-        <Price Icon={GiCondorEmblem} price={prices[1]} />
-      </li>
+      {pricingPlans.map((plan, idx) => (
+        <li
+          key={plan.id}
+          className={
+            idx % 2 === 0 && idx !== pricingPlans.length - 1
+              ? "relative vCustomLine sm:before:block before:hidden before:right-0"
+              : ""
+          }
+        >
+          <Price plan={plan} />
+        </li>
+      ))}
     </ul>
   );
 }
